@@ -37,7 +37,14 @@ io.on('connection', (socket) => {
   //   - Manda a todos la lista actualizada con el evento 'usuarios'
   //     usando [...usuarios.values()]
   //
-  // socket.on('entrar', (nombre) => { ... });
+  socket.on('entrar', (nombre) => {
+    if (typeof nombre !== 'string' || !nombre.trim()) return;
+
+    const nombreLimpio = nombre.trim();
+    usuarios.set(socket.id, nombreLimpio);
+    io.emit('sistema', `${nombreLimpio} se unió al chat`);
+    io.emit('usuarios', [...usuarios.values()]);
+  });
 
 
   // TODO 2 — Escuchar el evento 'mensaje' que manda el cliente.
@@ -58,6 +65,12 @@ io.on('connection', (socket) => {
   //   y vuelve a mandar la lista de 'usuarios'.
   socket.on('disconnect', () => {
     console.log('Se desconectó:', socket.id);
+    const nombre = usuarios.get(socket.id);
+    if (!nombre) return;
+
+    usuarios.delete(socket.id);
+    io.emit('sistema', `${nombre} salió del chat`);
+    io.emit('usuarios', [...usuarios.values()]);
   });
 });
 
