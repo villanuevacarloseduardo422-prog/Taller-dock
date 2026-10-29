@@ -75,6 +75,20 @@ Ana, Luis, Pedro  ── socket.on('mensaje') ──► lo pintan en pantalla
 Si confías en el autor que manda el cliente, cualquiera puede escribir haciéndose
 pasar por otro desde la consola del navegador.
 
+### Eventos del chat implementado
+
+| Evento | Dirección | Datos | Destino |
+|---|---|---|---|
+| `entrar` | Cliente → servidor | Nombre | El servidor registra al cliente y avisa a todos |
+| `mensaje` | Cliente → servidor | Texto | El servidor lo retransmite a todos con autor y hora |
+| `usuarios` | Servidor → clientes | Lista de nombres | Todos los conectados |
+| `escribiendo` | Cliente → servidor → clientes | El servidor usa el nombre registrado | Todos menos quien escribe |
+| `sistema` | Servidor → clientes | Aviso de entrada o salida | Todos los conectados |
+
+Al desconectarse un cliente, el servidor lo elimina de la lista y actualiza a
+los conectados. Tanto los mensajes como los nombres se pintan como texto, no
+como HTML recibido de otros usuarios.
+
 ---
 
 ## 3. Montar el proyecto
