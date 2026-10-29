@@ -25,7 +25,7 @@ formLogin.addEventListener('submit', (e) => {
   if (!miNombre) return;
 
   // TODO 1 — Emitir el evento 'entrar' al servidor con miNombre.
-  // socket.emit(...)
+  socket.emit('entrar', miNombre);
 
   login.classList.add('oculto');
   chat.classList.remove('oculto');
@@ -39,7 +39,7 @@ formMensaje.addEventListener('submit', (e) => {
   if (!texto) return;
 
   // TODO 2 — Emitir el evento 'mensaje' con el texto.
-  // socket.emit(...)
+  socket.emit('mensaje', texto);
 
   inputMensaje.value = '';
 });
@@ -47,20 +47,42 @@ formMensaje.addEventListener('submit', (e) => {
 // --- Avisar que estoy escribiendo ---------------------------
 inputMensaje.addEventListener('input', () => {
   // TODO 3 — Emitir 'escribiendo' con miNombre.
+  socket.emit('escribiendo', miNombre);
 });
 
 // --- Recibir del servidor -----------------------------------
 
 // TODO 4 — Escuchar 'mensaje' y pintarlo con pintarMensaje(data).
-// socket.on('mensaje', (data) => { ... });
+socket.on('mensaje', (data) => {
+  pintarMensaje(data);
+});
 
 // TODO 5 — Escuchar 'sistema' (texto) y pintarlo con pintarSistema(texto).
+socket.on('sistema', (texto) => {
+  pintarSistema(texto);
+});
 
 // TODO 6 — Escuchar 'usuarios' (array de nombres) y pintar la lista
 //          en #lista-usuarios.
+socket.on('usuarios', (nombres) => {
+  listaUsuarios.replaceChildren();
+  nombres.forEach((nombre) => {
+    const li = document.createElement('li');
+    li.textContent = nombre;
+    listaUsuarios.appendChild(li);
+  });
+});
 
 // TODO 7 — Escuchar 'escribiendo' (nombre) y mostrar
 //          "Fulano está escribiendo..." durante 1.5 segundos.
+let temporizadorEscribiendo;
+socket.on('escribiendo', (nombre) => {
+  escribiendo.textContent = `${nombre} está escribiendo...`;
+  clearTimeout(temporizadorEscribiendo);
+  temporizadorEscribiendo = setTimeout(() => {
+    escribiendo.textContent = '';
+  }, 1500);
+});
 
 // --- Helpers (ya hechos, úsalos) ----------------------------
 
