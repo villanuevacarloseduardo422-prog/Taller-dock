@@ -53,11 +53,24 @@ io.on('connection', (socket) => {
   //   OJO: nunca confíes en el autor que manda el cliente;
   //        tómalo de `usuarios.get(socket.id)`.
   //
-  // socket.on('mensaje', (texto) => { ... });
+  socket.on('mensaje', (texto) => {
+    const autor = usuarios.get(socket.id);
+    if (!autor || typeof texto !== 'string' || !texto.trim()) return;
+
+    io.emit('mensaje', {
+      autor,
+      texto: texto.trim(),
+      hora: new Date().toISOString(),
+    });
+  });
 
 
   // TODO 3 — Escuchar 'escribiendo' y avisar SOLO a los demás
   //   (pista: socket.broadcast.emit, no io.emit).
+  socket.on('escribiendo', () => {
+    const nombre = usuarios.get(socket.id);
+    if (nombre) socket.broadcast.emit('escribiendo', nombre);
+  });
 
 
   // TODO 4 — Manejar la desconexión.
